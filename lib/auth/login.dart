@@ -141,81 +141,73 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  _phoneNumber.text == ''
-                      ? TextButton(
-                          style: TextButton.styleFrom(
-                            side: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          onPressed: () {},
-                          child: const Text('Send'),
-                        )
-                      : TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            side: BorderSide(
-                              color: Colors.grey.shade300,
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      side: BorderSide(
+                        color: Colors.grey.shade300,
+                      ),
+                    ),
+                    onPressed: () async {
+                      setState(() {});
+                      if (_form.currentState!.validate()) {
+                        await httpServices.sendOtp(
+                          countryCode!.dialCode,
+                          _phoneNumber.text,
+                        );
+                        if (httpServices.approved == '400' &&
+                            httpServices.valid == null) {
+                          setState(() {
+                            httpServices.loginStatus = 'invalid';
+                          });
+                        }
+                        // if (httpServices.approved == "pending" &&
+                        //     httpServices.valid == false) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => Otp(
+                              countryCode: countryCode!.dialCode,
+                              phoneNumber: _phoneNumber.text,
                             ),
                           ),
-                          onPressed: () async {
-                            setState(() {});
-                            if (_form.currentState!.validate()) {
-                              await httpServices.sendOtp(
-                                countryCode!.dialCode,
-                                _phoneNumber.text,
-                              );
-                              if (httpServices.approved == '400' &&
-                                  httpServices.valid == null) {
-                                setState(() {
-                                  httpServices.loginStatus = 'invalid';
-                                });
-                              }
-                              // if (httpServices.approved == "pending" &&
-                              //     httpServices.valid == false) {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => Otp(
-                                    countryCode: countryCode!.dialCode,
-                                    phoneNumber: _phoneNumber.text,
+                        );
+                        // }
+                      }
+                    },
+                    // color: Colors.blue,
+                    child: httpServices.isLoading == true
+                        ? Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SpinKitCircle(
+                                    color: Colors.grey.shade300,
+                                    size: 30.0,
                                   ),
                                 ),
-                              );
-                              // }
-                            }
-                          },
-                          // color: Colors.blue,
-                          child: httpServices.isLoading == true
-                              ? Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: SpinKitCircle(
-                                          color: Colors.grey.shade300,
-                                          size: 30.0,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      const Text(
-                                        'Please wait...',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : const Text(
-                                  'Send',
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  'Please wait...',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
                                   ),
                                 ),
-                        ),
+                              ],
+                            ),
+                          )
+                        : const Text(
+                            'Send',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),

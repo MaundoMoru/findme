@@ -1,22 +1,22 @@
 import 'dart:convert';
-import 'package:findme/auth/login.dart';
 import 'package:findme/data.dart';
 import 'package:findme/drawer.dart';
 import 'package:findme/httpServices/httpServices.dart';
+import 'package:findme/imageview.dart';
 import 'package:findme/models/user.dart';
 import 'package:findme/post.dart';
 import 'package:findme/profile.dart';
-import 'package:findme/updates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:socket_io_client/socket_io_client.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
+import 'package:readmore/readmore.dart';
 import 'models/post.dart';
 
 class Home extends StatefulWidget {
@@ -27,6 +27,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  String advert = "advert";
   TextEditingController search = TextEditingController();
   final PanelController panelController = PanelController();
   String sortTByCategory = '';
@@ -102,7 +103,12 @@ class _HomeState extends State<Home> {
                   pinned: true,
                   snap: false,
                   centerTitle: false,
-                  title: const Text('Find me'),
+                  title: Text(
+                    'Find me',
+                    style: GoogleFonts.montserrat(
+                        textStyle:
+                            const TextStyle(fontWeight: FontWeight.bold)),
+                  ),
                   actions: [
                     IconButton(
                       icon: const Icon(Icons.post_add),
@@ -212,22 +218,23 @@ class _HomeState extends State<Home> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Top updates',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                  style: GoogleFonts.montserrat(
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Updates(),
-                      ),
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => buildSheet(),
+                      backgroundColor: Colors.transparent,
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'View all',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                    style: GoogleFonts.montserrat(textStyle: TextStyle()),
                   ),
                 ),
               ],
@@ -244,6 +251,8 @@ class _HomeState extends State<Home> {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasError) {
                   return const Text('Error');
+                } else if (!snapshot.hasData) {
+                  const Text("No Posts");
                 }
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -270,19 +279,35 @@ class _HomeState extends State<Home> {
                               Stack(
                                 clipBehavior: Clip.none,
                                 children: [
-                                  Container(
-                                    height: 120,
-                                    width: 180,
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade100,
-                                      borderRadius: BorderRadius.circular(10),
-                                      image: DecorationImage(
-                                        image:
-                                            NetworkImage(post.file.toString()),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
+                                  post.file == '' || post.file == null
+                                      ? Container(
+                                          height: 120.0,
+                                          width: 180.0,
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: const DecorationImage(
+                                              image: AssetImage(
+                                                  'images/default.png'),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 120,
+                                          width: 180,
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: DecorationImage(
+                                              image: NetworkImage(
+                                                  post.file.toString()),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
                                   Positioned(
                                     bottom: -20,
                                     right: 5,
@@ -334,22 +359,28 @@ class _HomeState extends State<Home> {
                               ),
                               Text(
                                 post.user!.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.montserrat(
+                                  textStyle: const TextStyle(),
+                                ),
                               ),
                               const SizedBox(
                                 height: 10,
                               ),
-                              const Row(
+                              Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.lock,
                                     size: 13,
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 5,
                                   ),
-                                  Text('Subscribe')
+                                  Text(
+                                    'Subscribe',
+                                    style: GoogleFonts.montserrat(
+                                        textStyle: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  )
                                 ],
                               )
                             ],
@@ -492,11 +523,20 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                         title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(user.name),
-                            const SizedBox(
-                              width: 3,
+                            SizedBox(
+                              width: 100,
+                              child: Text(
+                                overflow: TextOverflow.ellipsis,
+                                user.name,
+                                style: GoogleFonts.montserrat(
+                                    textStyle: TextStyle()),
+                              ),
                             ),
+                            // const SizedBox(
+                            //   width: 3,
+                            // ),
                             RatingBar.builder(
                               initialRating: 1.0,
                               minRating: 1,
@@ -525,7 +565,7 @@ class _HomeState extends State<Home> {
                                     shape: BoxShape.circle),
                                 child: const Icon(
                                   Icons.lock,
-                                  size: 20,
+                                  size: 18,
                                 ),
                               )
                             : Container(
@@ -546,6 +586,8 @@ class _HomeState extends State<Home> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+                              style: GoogleFonts.montserrat(
+                                  textStyle: TextStyle(fontSize: 12)),
                               user.bio,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
@@ -826,7 +868,9 @@ class _HomeState extends State<Home> {
                 ),
                 title: Row(
                   children: [
-                    Text(user.name),
+                    Text(
+                      user.name,
+                    ),
                     const SizedBox(
                       width: 3,
                     ),
@@ -1043,6 +1087,787 @@ class _HomeState extends State<Home> {
                   }),
             ),
           ],
+        ),
+      );
+
+  Widget buildSheet() => GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        behavior: HitTestBehavior.opaque,
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.5,
+          maxChildSize: 1,
+          builder: (_, controller) {
+            return FutureBuilder(
+              future: httpServices.fetchPosts(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasError) {
+                  return const Text('Error');
+                } else if (!snapshot.hasData) {
+                  const Text("No Posts");
+                }
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    physics: const ScrollPhysics(),
+                    controller: controller,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "Updates",
+                            style: GoogleFonts.montserrat(
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: posts!.length,
+                          itemBuilder: (BuildContext context, index) {
+                            var post = posts![index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(),
+                              child: Card(
+                                elevation: 5,
+                                child: SizedBox(
+                                  // width: 300,
+                                  // height: 500,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                post.user!.image.toString() ==
+                                                        ''
+                                                    ? Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: Colors
+                                                                    .blue
+                                                                    .shade100,
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                        height: 35,
+                                                        width: 35,
+                                                        child: Center(
+                                                          child: Text(
+                                                            post.user!.name[0],
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        height: 35,
+                                                        width: 35,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          image:
+                                                              DecorationImage(
+                                                            image: NetworkImage(
+                                                              post.user!.image
+                                                                  .toString(),
+                                                            ),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              offset:
+                                                                  const Offset(
+                                                                      5.0, 5.0),
+                                                              blurRadius: 1,
+                                                              spreadRadius: 1,
+                                                              color: Colors
+                                                                  .grey.shade400
+                                                                  .withOpacity(
+                                                                      0.4),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                const SizedBox(
+                                                  width: 8,
+                                                ),
+                                                Text(
+                                                  "Abraham Lincoln",
+                                                  style: GoogleFonts.montserrat(
+                                                    textStyle: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const Icon(
+                                              Icons.more_vert_outlined,
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Divider(
+                                          color: Colors.grey.shade500,
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          height: 250,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                  post.file.toString(),
+                                                ),
+                                                fit: BoxFit.cover),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Visibility(
+                                          visible: post.heading
+                                              .toString()
+                                              .isNotEmpty,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Visibility(
+                                              visible: post.heading
+                                                  .toString()
+                                                  .isNotEmpty,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      post.heading.toString(),
+                                                      style: GoogleFonts
+                                                          .montserrat(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 8,
+                                                    ),
+                                                    //
+                                                    ReadMoreText(
+                                                      post.description
+                                                          .toString(),
+                                                      trimLines: 5,
+                                                      trimMode: TrimMode.Line,
+                                                      trimCollapsedText:
+                                                          'Show more',
+                                                      trimExpandedText:
+                                                          'Show less',
+                                                      style: GoogleFonts
+                                                          .montserrat(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                // color: Colors.grey,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                      ),
+                                                      moreStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                    ),
+                                                    TextButton(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.blue.shade50,
+                                                        minimumSize: const Size
+                                                                .fromHeight(
+                                                            40), // NEW
+                                                      ),
+                                                      onPressed: () {},
+                                                      child: Text(
+                                                        'Visit ${post.user!.name}',
+                                                        style: const TextStyle(
+                                                          color: Colors.blue,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        Row(
+                                          children: [
+                                            SimpleCircularProgressBar(
+                                              progressStrokeWidth: 4,
+                                              backColor: Colors.grey.shade200,
+                                              backStrokeWidth: 4,
+                                              progressColors: const [
+                                                Colors.blue
+                                              ],
+                                              maxValue: 40,
+                                              size: 50,
+                                              onGetText: (double value) {
+                                                return Text(
+                                                    '${value.toInt()}%');
+                                              },
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Targeting 90% ",
+                                                  style: GoogleFonts.montserrat(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.blue),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                SizedBox(
+                                                  width: 120,
+                                                  child: Text(
+                                                    "Medium targets reached",
+                                                    style:
+                                                        GoogleFonts.montserrat(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Container(
+                              //   decoration:
+                              //       const BoxDecoration(color: Colors.white),
+
+                              // )
+                              // Container(
+                              //   decoration:
+                              //       const BoxDecoration(color: Colors.white),
+                              //   child: Column(
+                              //     crossAxisAlignment: CrossAxisAlignment.start,
+                              //     children: [
+                              //       Padding(
+                              //         padding: const EdgeInsets.symmetric(
+                              //             horizontal: 10),
+                              //         child: Row(
+                              //           mainAxisAlignment:
+                              //               MainAxisAlignment.spaceBetween,
+                              //           children: [
+                              //             Row(
+                              //               children: [
+                              //                 post.user!.image.toString() == ''
+                              //                     ? Container(
+                              //                         decoration: BoxDecoration(
+                              //                             color: Colors
+                              //                                 .blue.shade100,
+                              //                             shape:
+                              //                                 BoxShape.circle),
+                              //                         height: 35,
+                              //                         width: 35,
+                              //                         child: Center(
+                              //                           child: Text(
+                              //                             post.user!.name[0],
+                              //                           ),
+                              //                         ),
+                              //                       )
+                              //                     : Container(
+                              //                         height: 35,
+                              //                         width: 35,
+                              //                         decoration: BoxDecoration(
+                              //                           shape: BoxShape.circle,
+                              //                           image: DecorationImage(
+                              //                               image: NetworkImage(
+                              //                                 post.user!.image
+                              //                                     .toString(),
+                              //                               ),
+                              //                               fit: BoxFit.cover),
+                              //                         ),
+                              //                       ),
+                              //                 const SizedBox(
+                              //                   width: 8,
+                              //                 ),
+                              //                 Column(
+                              //                   crossAxisAlignment:
+                              //                       CrossAxisAlignment.start,
+                              //                   children: [
+                              //                     Text(
+                              //                       post.user!.name,
+                              //                       style: const TextStyle(
+                              //                         fontWeight:
+                              //                             FontWeight.bold,
+                              //                       ),
+                              //                     ),
+                              //                     Text(
+                              //                       post.user!.bio,
+                              //                       style: const TextStyle(
+                              //                           fontWeight:
+                              //                               FontWeight.bold,
+                              //                           color: Colors.grey),
+                              //                     )
+                              //                   ],
+                              //                 )
+                              //               ],
+                              //             ),
+                              //             InkWell(
+                              //               onTap: () {
+                              //                 showModalBottomSheet(
+                              //                   context: context,
+                              //                   builder: (context) {
+                              //                     return const Column(
+                              //                       mainAxisSize:
+                              //                           MainAxisSize.min,
+                              //                       children: <Widget>[
+                              //                         ListTile(
+                              //                           leading: Icon(Icons
+                              //                               .block_outlined),
+                              //                           title: Text('Block'),
+                              //                         ),
+                              //                         ListTile(
+                              //                           leading: Icon(
+                              //                               Icons.star_outline),
+                              //                           title: Text('Rate'),
+                              //                         ),
+                              //                         ListTile(
+                              //                           leading: Icon(Icons
+                              //                               .check_circle_outline),
+                              //                           title: Text(
+                              //                               'Visit account'),
+                              //                         ),
+                              //                       ],
+                              //                     );
+                              //                   },
+                              //                 );
+                              //               },
+                              //               child: Row(
+                              //                 children: [
+                              //                   Row(
+                              //                     children: [
+                              //                       const Icon(
+                              //                         Icons.timer_outlined,
+                              //                         size: 16,
+                              //                         color: Colors.grey,
+                              //                       ),
+                              //                       const SizedBox(
+                              //                         width: 3,
+                              //                       ),
+                              //                       Text("22 min",
+                              //                           style: TextStyle(
+                              //                             color: Colors.grey,
+                              //                           ))
+                              //                     ],
+                              //                   ),
+                              //                   const Icon(
+                              //                     Icons.more_vert_outlined,
+                              //                   ),
+                              //                 ],
+                              //               ),
+                              //             )
+                              //           ],
+                              //         ),
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 10,
+                              //       ),
+                              //       Padding(
+                              //         padding: const EdgeInsets.symmetric(
+                              //             horizontal: 10),
+                              //         child: Visibility(
+                              //           visible:
+                              //               post.heading.toString().isNotEmpty,
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.symmetric(
+                              //                 vertical: 10),
+                              //             child: Text(
+                              //               post.heading.toString(),
+                              //               style: GoogleFonts.montserrat(
+                              //                 textStyle: const TextStyle(
+                              //                   fontWeight: FontWeight.bold,
+                              //                 ),
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       Padding(
+                              //         padding: const EdgeInsets.symmetric(
+                              //             horizontal: 10),
+                              //         child: Visibility(
+                              //           visible:
+                              //               post.file.toString().isNotEmpty,
+                              //           child: InkWell(
+                              //             onTap: () {
+                              //               Navigator.push(
+                              //                 context,
+                              //                 MaterialPageRoute(
+                              //                   builder: (context) => ImageView(
+                              //                     image: post.file.toString(),
+                              //                   ),
+                              //                 ),
+                              //               );
+                              //             },
+                              //             child: Container(
+                              //               height: 300,
+                              //               width: MediaQuery.of(context)
+                              //                   .size
+                              //                   .width,
+                              //               decoration: BoxDecoration(
+                              //                 image: DecorationImage(
+                              //                     image: NetworkImage(
+                              //                       post.file.toString(),
+                              //                     ),
+                              //                     fit: BoxFit.cover),
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 10,
+                              //       ),
+                              //       Visibility(
+                              //         visible: post.heading!.isNotEmpty,
+                              //         child: Padding(
+                              //           padding: const EdgeInsets.symmetric(
+                              //               horizontal: 10),
+                              //           child: Container(
+                              //             decoration: const BoxDecoration(
+                              //               color: Colors.white,
+                              //               // borderRadius: const BorderRadius.all(
+                              //               //   Radius.circular(10.0),
+                              //               // ),
+                              //               // boxShadow: [
+                              //               //   BoxShadow(
+                              //               //     color: Colors.grey.shade300,
+                              //               //     spreadRadius: 2,
+                              //               //     blurRadius: 5,
+                              //               //     offset: const Offset(0, 3),
+                              //               //   ),
+                              //               // ],
+                              //             ),
+                              //             child: Padding(
+                              //               padding: const EdgeInsets.all(8.0),
+                              //               child: Column(
+                              //                 children: [
+                              //                   Row(
+                              //                     children: [
+                              //                       const Icon(
+                              //                           Icons.link_outlined),
+                              //                       const SizedBox(
+                              //                         width: 5,
+                              //                       ),
+                              //                       Text(post.companylink,
+                              //                           style: GoogleFonts
+                              //                               .montserrat(
+                              //                             textStyle:
+                              //                                 const TextStyle(
+                              //                                     fontWeight:
+                              //                                         FontWeight
+                              //                                             .w500),
+                              //                           ))
+                              //                     ],
+                              //                   ),
+                              //                   const Divider(),
+                              //                   Row(
+                              //                     children: [
+                              //                       const Icon(
+                              //                           Icons.work_outline),
+                              //                       const SizedBox(
+                              //                         width: 5,
+                              //                       ),
+                              //                       Text(
+                              //                         'people image',
+                              //                         style: GoogleFonts
+                              //                             .montserrat(
+                              //                           textStyle:
+                              //                               const TextStyle(
+                              //                                   fontWeight:
+                              //                                       FontWeight
+                              //                                           .w500),
+                              //                         ),
+                              //                       )
+                              //                     ],
+                              //                   ),
+                              //                   const Divider(),
+                              //                   // Row(
+                              //                   //   children: [
+                              //                   //     const Icon(
+                              //                   //         Icons.link_outlined),
+                              //                   //     const SizedBox(
+                              //                   //       width: 5,
+                              //                   //     ),
+                              //                   //     Text(post.companylink)
+                              //                   //   ],
+                              //                   // ),
+                              //                   // const Divider()
+                              //                 ],
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 10,
+                              //       ),
+                              //       Padding(
+                              //         padding: const EdgeInsets.symmetric(
+                              //             horizontal: 10),
+                              //         child: Visibility(
+                              //           visible: post.description
+                              //               .toString()
+                              //               .isNotEmpty,
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(8.0),
+                              //             child: Column(
+                              //               crossAxisAlignment:
+                              //                   CrossAxisAlignment.start,
+                              //               children: [
+                              //                 Text(
+                              //                   'Description',
+                              //                   style: GoogleFonts.montserrat(
+                              //                     textStyle: const TextStyle(
+                              //                         fontWeight:
+                              //                             FontWeight.bold),
+                              //                   ),
+                              //                 ),
+                              //                 const SizedBox(
+                              //                   height: 4,
+                              //                 ),
+                              //                 ReadMoreText(
+                              //                   post.description.toString(),
+                              //                   trimLines: 5,
+                              //                   // colorClickableText:
+                              //                   //     Colors.grey.shade700,
+                              //                   trimMode: TrimMode.Line,
+                              //                   trimCollapsedText: 'Show more',
+                              //                   trimExpandedText: 'Show less',
+                              //                   style: GoogleFonts.montserrat(
+                              //                     textStyle: const TextStyle(
+                              //                         // color: Colors.grey,
+                              //                         fontWeight:
+                              //                             FontWeight.w500),
+                              //                   ),
+                              //                   moreStyle: const TextStyle(
+                              //                       fontWeight:
+                              //                           FontWeight.bold),
+                              //                 ),
+                              //                 const SizedBox(
+                              //                   height: 5,
+                              //                 ),
+                              //                 TextButton(
+                              //                   style: TextButton.styleFrom(
+                              //                     backgroundColor:
+                              //                         Colors.blue.shade50,
+                              //                     minimumSize:
+                              //                         const Size.fromHeight(
+                              //                             40), // NEW
+                              //                   ),
+                              //                   onPressed: () {},
+                              //                   child: Text(
+                              //                     'Visit ${post.user!.name}',
+                              //                     style: const TextStyle(
+                              //                       color: Colors.blue,
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //                 const SizedBox(
+                              //                   height: 20,
+                              //                 ),
+                              //                 // Center(
+                              //                 //   child: Row(
+                              //                 //     mainAxisAlignment:
+                              //                 //         MainAxisAlignment
+                              //                 //             .spaceBetween,
+                              //                 //     children: [
+                              //                 //       Text(
+                              //                 //         "Actions",
+                              //                 //         style: GoogleFonts.montserrat(
+                              //                 //             textStyle:
+                              //                 //                 const TextStyle(
+                              //                 //                     fontWeight:
+                              //                 //                         FontWeight
+                              //                 //                             .bold)),
+                              //                 //       ),
+
+                              //                 //     ],
+                              //                 //   ),
+                              //                 // ),
+                              //                 // Divider(
+                              //                 //   height: 10,
+                              //                 //   thickness: 3,
+                              //                 //   // indent: 20,
+                              //                 //   endIndent: 250,
+                              //                 //   color: Colors.grey.shade400,
+                              //                 // ),
+                              //                 // const SizedBox(
+                              //                 //   height: 20,
+                              //                 // ),
+                              //                 // const Divider(),
+                              //                 // Row(
+                              //                 //   mainAxisAlignment:
+                              //                 //       MainAxisAlignment
+                              //                 //           .spaceEvenly,
+                              //                 //   children: [
+                              //                 //     Column(
+                              //                 //       children: [
+                              //                 //         Container(
+                              //                 //           padding:
+                              //                 //               const EdgeInsets
+                              //                 //                   .all(5),
+                              //                 //           decoration:
+                              //                 //               BoxDecoration(
+                              //                 //                   color: Colors
+                              //                 //                       .amber
+                              //                 //                       .shade50,
+                              //                 //                   shape: BoxShape
+                              //                 //                       .circle),
+                              //                 //           child: const Icon(
+                              //                 //             Icons
+                              //                 //                 .bookmark_outline,
+                              //                 //             color: Colors.amber,
+                              //                 //             size: 22,
+                              //                 //           ),
+                              //                 //         ),
+                              //                 //         const Text('bookmark')
+                              //                 //       ],
+                              //                 //     ),
+                              //                 //     Column(
+                              //                 //       children: [
+                              //                 //         Container(
+                              //                 //           padding:
+                              //                 //               const EdgeInsets
+                              //                 //                   .all(5),
+                              //                 //           decoration:
+                              //                 //               BoxDecoration(
+                              //                 //                   color: Colors
+                              //                 //                       .red
+                              //                 //                       .shade50,
+                              //                 //                   shape: BoxShape
+                              //                 //                       .circle),
+                              //                 //           child: Icon(
+                              //                 //             Icons
+                              //                 //                 .reviews_outlined,
+                              //                 //             color: Colors
+                              //                 //                 .red.shade300,
+                              //                 //             size: 22,
+                              //                 //           ),
+                              //                 //         ),
+                              //                 //         const Text(
+                              //                 //           'Reviews',
+                              //                 //           style: TextStyle(),
+                              //                 //         )
+                              //                 //       ],
+                              //                 //     ),
+                              //                 //     Column(
+                              //                 //       children: [
+                              //                 //         Container(
+                              //                 //           padding:
+                              //                 //               const EdgeInsets
+                              //                 //                   .all(5),
+                              //                 //           decoration:
+                              //                 //               BoxDecoration(
+                              //                 //                   color: Colors
+                              //                 //                       .purple
+                              //                 //                       .shade50,
+                              //                 //                   shape: BoxShape
+                              //                 //                       .circle),
+                              //                 //           child: Icon(
+                              //                 //             Icons.work_outline,
+                              //                 //             color: Colors
+                              //                 //                 .purple.shade300,
+                              //                 //             size: 22,
+                              //                 //           ),
+                              //                 //         ),
+                              //                 //         const Text('Jobs')
+                              //                 //       ],
+                              //                 //     )
+                              //                 //   ],
+                              //                 // ),
+                              //                 // const Divider()
+                              //               ],
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 10,
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
         ),
       );
 }

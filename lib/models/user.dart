@@ -14,6 +14,7 @@ class User {
   final String payment;
   final String rating;
   final String online;
+  final String enabled;
 
   const User({
     required this.id,
@@ -26,6 +27,7 @@ class User {
     required this.payment,
     required this.rating,
     required this.online,
+    required this.enabled,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

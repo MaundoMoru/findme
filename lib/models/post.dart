@@ -7,14 +7,20 @@ part 'post.g.dart';
 class Post {
   final int? id;
   final int? userId;
+  final String? category;
+  final String? heading;
   final String? description;
+  final String companylink;
   final String? file;
   final User? user;
 
   const Post({
     required this.id,
     required this.userId,
+    required this.category,
+    required this.heading,
     required this.description,
+    required this.companylink,
     required this.file,
     required this.user,
   });

@@ -1,3 +1,4 @@
+import 'package:findme/auth/login.dart';
 import 'package:findme/data.dart';
 import 'package:findme/logdetails.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,15 @@ class _LogsState extends State<Logs> {
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         // centerTitle: true,
-        title: const Text(
-          'Logs',
-          style: TextStyle(),
+        title: InkWell(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => LoginScreen()));
+          },
+          child: const Text(
+            'Logs',
+            style: TextStyle(),
+          ),
         ),
       ),
       body: GroupedListView<dynamic, String>(

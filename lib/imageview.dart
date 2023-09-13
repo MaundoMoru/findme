@@ -30,8 +30,7 @@ class ImageView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.black,
                 image: DecorationImage(
-                  image: NetworkImage(image),
-                ),
+                    image: NetworkImage(image), fit: BoxFit.contain),
               ),
             ),
     );

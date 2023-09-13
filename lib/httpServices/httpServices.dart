@@ -281,8 +281,8 @@ class HttpServices {
     return parsed.map<Task>((json) => Task.fromJson(json)).toList();
   }
 
-  Future<Post> createPost(
-      int userId, String description, XFile? image, XFile? video) async {
+  Future<Post> createPost(int userId, String heading, String description,
+      String companylink, XFile? image, XFile? video) async {
     print(isLoading);
     isLoading = true;
     print(isLoading);

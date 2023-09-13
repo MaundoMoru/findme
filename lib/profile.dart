@@ -7,6 +7,7 @@ import 'package:findme/models/user.dart';
 import 'package:findme/ratings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -74,9 +75,11 @@ class _ProfileState extends State<Profile> {
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Profile',
-          style: TextStyle(),
+          style: GoogleFonts.montserrat(
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       body: ListView(
@@ -144,7 +147,10 @@ class _ProfileState extends State<Profile> {
           Center(
             child: Text(
               '${widget.name}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              style: GoogleFonts.montserrat(
+                textStyle:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+              ),
             ),
           ),
           InkWell(
@@ -191,7 +197,9 @@ class _ProfileState extends State<Profile> {
               trimMode: TrimMode.Line,
               trimCollapsedText: 'Show more',
               trimExpandedText: 'Show less',
-              style: const TextStyle(color: Colors.grey),
+              style: GoogleFonts.montserrat(
+                textStyle: const TextStyle(color: Colors.grey),
+              ),
               moreStyle: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -225,12 +233,14 @@ class _ProfileState extends State<Profile> {
                     color: Colors.blue.shade100,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Hire',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.montserrat(
+                        textStyle: const TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -361,12 +371,15 @@ class _ProfileState extends State<Profile> {
                   // friends
                   Center(
                     child: Text(
-                      users!.length == 1
-                          ? '(${users!.length}) other related'
-                          : '(${users!.length}) others related',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                        users!.length == 1
+                            ? '(${users!.length}) other related'
+                            : '(${users!.length}) others related',
+                        style: GoogleFonts.montserrat(
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )),
                   ),
                   const SizedBox(
                     height: 10,
@@ -399,64 +412,103 @@ class _ProfileState extends State<Profile> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    user.image == ''
-                                        ? Container(
-                                            height: 45,
-                                            width: 45,
-                                            decoration: BoxDecoration(
-                                              color: Colors.blue.shade200,
-                                              shape: BoxShape.circle,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  offset:
-                                                      const Offset(5.0, 5.0),
-                                                  blurRadius: 1,
-                                                  spreadRadius: 1,
-                                                  color: Colors.grey.shade400
-                                                      .withOpacity(0.4),
-                                                )
-                                              ],
-                                            ),
-                                            child: Center(
-                                                child: Text(user.name[0])),
-                                          )
-                                        : InkWell(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ImageView(
-                                                    image:
-                                                        user.image.toString(),
+                                    Row(
+                                      children: [
+                                        user.image == ''
+                                            ? Container(
+                                                height: 45,
+                                                width: 45,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue.shade200,
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      offset: const Offset(
+                                                          5.0, 5.0),
+                                                      blurRadius: 1,
+                                                      spreadRadius: 1,
+                                                      color: Colors
+                                                          .grey.shade400
+                                                          .withOpacity(0.4),
+                                                    )
+                                                  ],
+                                                ),
+                                                child: Center(
+                                                    child: Text(user.name[0])),
+                                              )
+                                            : InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ImageView(
+                                                        image: user.image
+                                                            .toString(),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  height: 45,
+                                                  width: 45,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade200,
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          user.image),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        offset: const Offset(
+                                                            5.0, 5.0),
+                                                        blurRadius: 1,
+                                                        spreadRadius: 1,
+                                                        color: Colors
+                                                            .grey.shade400
+                                                            .withOpacity(0.4),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
-                                              );
-                                            },
-                                            child: Container(
-                                              height: 45,
-                                              width: 45,
-                                              decoration: BoxDecoration(
-                                                color: Colors.blue.shade200,
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                  image:
-                                                      NetworkImage(user.image),
-                                                  fit: BoxFit.cover,
+                                              ),
+                                        const SizedBox(
+                                          width: 14,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              width: 100,
+                                              child: Text(
+                                                user.name,
+                                                style: GoogleFonts.montserrat(
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600),
                                                 ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    offset:
-                                                        const Offset(5.0, 5.0),
-                                                    blurRadius: 1,
-                                                    spreadRadius: 1,
-                                                    color: Colors.grey.shade400
-                                                        .withOpacity(0.4),
-                                                  )
-                                                ],
                                               ),
                                             ),
-                                          ),
+                                            SizedBox(
+                                              width: 100,
+                                              child: Text(
+                                                user.bio,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.montserrat(
+                                                  textStyle: const TextStyle(
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                     Container(
                                       height: 30,
                                       width: 70,
@@ -466,11 +518,13 @@ class _ProfileState extends State<Profile> {
                                       ),
                                       child: Center(
                                         child: user.hired == 'true'
-                                            ? const Text(
+                                            ? Text(
                                                 'Hired',
-                                                style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.bold,
+                                                style: GoogleFonts.montserrat(
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               )
                                             : InkWell(
@@ -490,11 +544,14 @@ class _ProfileState extends State<Profile> {
                                                   //   ),
                                                   // );
                                                 },
-                                                child: const Text(
+                                                child: Text(
                                                   'Hire',
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontWeight: FontWeight.bold,
+                                                  style: GoogleFonts.montserrat(
+                                                    textStyle: const TextStyle(
+                                                      color: Colors.blue,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -502,18 +559,12 @@ class _ProfileState extends State<Profile> {
                                     )
                                   ],
                                 ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  user.bio,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 40),
                                 users!.length < 3
-                                    ? Text(user.name)
+                                    ? Text(user.name,
+                                        style: GoogleFonts.montserrat(
+                                          textStyle: const TextStyle(),
+                                        ))
                                     : Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
@@ -724,12 +775,15 @@ class _ProfileState extends State<Profile> {
                                             ),
                                           ),
                                           const SizedBox(
-                                            width: 10,
+                                            width: 5,
                                           ),
                                           Expanded(
                                             child: Text(
-                                              '${user.name} related',
+                                              "Related",
                                               overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.montserrat(
+                                                textStyle: const TextStyle(),
+                                              ),
                                             ),
                                           )
                                         ],

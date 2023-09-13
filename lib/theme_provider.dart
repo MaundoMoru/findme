@@ -10,6 +10,7 @@ class ThemeProvider extends ChangeNotifier {
       ? ThemeData(
           primaryColor: Colors.black,
           brightness: Brightness.dark,
+
           // accentColor: Colors.blue,
           // accentIconTheme: const IconThemeData(color: Colors.blue),
           dividerColor: Colors.black38,
@@ -19,6 +20,7 @@ class ThemeProvider extends ChangeNotifier {
       : ThemeData(
           primaryColor: Colors.white,
           brightness: Brightness.light,
+
           scaffoldBackgroundColor: Colors.grey.shade100,
           colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey)
               .copyWith(background: const Color(0xFFE5E5E5)),
